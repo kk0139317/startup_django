@@ -108,12 +108,22 @@ class UserListView(APIView):
 #         print(serializer.data)
 #         return Response(serializer.data)
     
-class ProfileDetailView(generics.RetrieveAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-    lookup_field = 'id'
+# class ProfileDetailView(generics.RetrieveAPIView):
+#     queryset = Profile.objects.all()
+#     serializer_class = ProfileSerializer
+#     lookup_field = 'id'
 
-
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ProfileDetailView(request, id):
+    try:
+        profile = Profile.objects.get(id = id)
+        # print(request.user)
+        serializer = ProfileSerializer(profile)
+        return Response(serializer.data)
+    except Profile.DoesNotExist:
+        return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    
 
 def testing(request, id):
     id = id
