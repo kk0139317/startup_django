@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-=4f=zj8w^@icnsdff!-(0i_h)k5uk2jt9mjc0$pw#lb4mt%-cp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.0.103']
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -57,9 +57,9 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
 ]
 CORS_ALLOWED_ORIGINS = [
-    "http://192.168.0.103:3000",
+    "http://127.0.0.1:3000",
 ]
-CSRF_TRUSTED_ORIGINS = ['http://192.168.0.103:3000']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:3000']
 
 CORS_ALLOW_ALL_ORIGINS = True
 
