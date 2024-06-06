@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ContactMessage, Profile
+from .models import ContactMessage, Profile, SubmitForm, NewSubmitForm
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -56,7 +56,14 @@ class ContactMessageSerializer(serializers.ModelSerializer):
         model = ContactMessage
         fields = '__all__'
 
+class SubmitFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewSubmitForm
+        fields = '__all__'
 
+
+
+# SubmitFormSerializer
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
