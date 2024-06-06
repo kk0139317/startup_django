@@ -24,4 +24,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('home.urls')),
     path('data/<int:id>', views.testing, name='testing-detail'),
+    path('form_data.json', views.download_json_file, name='hh')
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

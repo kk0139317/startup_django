@@ -17,7 +17,7 @@ from rest_framework import generics
 from django.http import HttpResponse
 from rest_framework.permissions import AllowAny
 from home.models import SubmitForm
-
+import json
 
 
 @api_view(['GET'])
@@ -55,6 +55,14 @@ def submit_contact_form(request):
 #             serializer.save()
 #             return Response(serializer.data, status=status.HTTP_201_CREATED)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+import json
+from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
+from .models import SubmitForm
 
 @api_view(['POST'])
 @csrf_exempt
@@ -97,6 +105,8 @@ def submit_form(request):
         unetEncoderLR = request.data.get('unetEncoderLR')
         cacheTextEncoderOutput = request.data.get('cacheTextEncoderOutput')
         noHalfVAE = request.data.get('noHalfVAE')
+        
+        # Save submitted form data to the database
         details = SubmitForm(config=config, accelerateLaunch=accelerateLaunch, 
                              model=model, metadata=metadata, folders=folders, datasetPreparation=datasetPreparation,
                              presets=presets, loraType=loraType, networkWeights=networkWeights, 
@@ -110,8 +120,56 @@ def submit_form(request):
                              minBucketRes=minBucketRes, maxBucketRes=maxBucketRes, textEncoderLR= textEncoderLR, unetEncoderLR=unetEncoderLR,
                              cacheTextEncoderOutput=cacheTextEncoderOutput, noHalfVAE=noHalfVAE)
         details.save()
+
+        # Create a dictionary with the form data
+        form_data = {
+            'config': config,
+            'accelerateLaunch': accelerateLaunch,
+            'model': model,
+            'metadata': metadata,
+            'folders': folders,
+            'datasetPreparation': datasetPreparation,
+            'presets': presets,
+            'loraType': loraType,
+            'networkWeights': networkWeights,
+            'dimFromWeight': dimFromWeight,
+            'trainBatchSize': trainBatchSize,
+            'epoch': epoch,
+            'maxTrainEpoch': maxTrainEpoch,
+            'maxTrainStep': maxTrainStep,
+            'saveEveryNEpochs': saveEveryNEpochs,
+            'captionFileExtension': captionFileExtension,
+            'seed': seed,
+            'cacheLatent': cacheLatent,
+            'cacheLatentToDisk': cacheLatentToDisk,
+            'lrScheduler': lrScheduler,
+            'optimizer': optimizer,
+            'maxGradNorm': maxGradNorm,
+            'lrSchedulerArg': lrSchedulerArg,
+            'optimizerArg': optimizerArg,
+            'learningRate': learningRate,
+            'lrWarmup': lrWarmup,
+            'lrCycle': lrCycle,
+            'lrPower': lrPower,
+            'maxResolution': maxResolution,
+            'stopTE': stopTE,
+            'enableBuckets': enableBuckets,
+            'minBucketRes': minBucketRes,
+            'maxBucketRes': maxBucketRes,
+            'textEncoderLR': textEncoderLR,
+            'unetEncoderLR': unetEncoderLR,
+            'cacheTextEncoderOutput': cacheTextEncoderOutput,
+            'noHalfVAE': noHalfVAE,
+        }
+
+        # Write form data to a JSON file
+        with open('form_data.json', 'w') as json_file:
+            json.dump(form_data, json_file)
+
+        # Return a success response
         return Response(status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserCreate(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -200,3 +258,16 @@ def testing(request, id):
     id = id
     print(id)
     return HttpResponse("This is ", id)
+
+def download_json_file(request):
+    # Read the JSON file content
+    with open('form_data.json', 'r') as file:
+        json_content = file.read()
+
+    # Set response content type
+    response = HttpResponse(json_content, content_type='application/json')
+
+    # Set Content-Disposition header to force download
+    response['Content-Disposition'] = 'attachment; filename="form_data.json"'
+
+    return response
