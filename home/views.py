@@ -168,7 +168,7 @@ def submit_form(request):
 
         # Return a success response
         return Response(status=status.HTTP_201_CREATED)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return HttpResponse("HI WE DIDNT SUPPORT GET REQUEST")
 
 
 class UserCreate(generics.CreateAPIView):
