@@ -14,5 +14,6 @@ urlpatterns = [
     path('profile/<int:id>', views.ProfileDetailView, name='profile-detail'),
     path('current_user_profile/', current_user_profile, name='current_user_profile'),
     path('submit-form/', submit_form, name="Submit Form"),
+    path('upload-image/', ImageUploadView.as_view(), name="Uload Image"),
 
 ]

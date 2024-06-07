@@ -70,3 +70,5 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ImageUploadSerializer(serializers.Serializer):
+    image = serializers.ImageField()

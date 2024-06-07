@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import ContactMessage, Profile
-from .serializers import ContactMessageSerializer, ProfileSerializer, UserLoginSerializer, SubmitFormSerializer
+from .serializers import ContactMessageSerializer, ProfileSerializer, UserLoginSerializer, ImageUploadSerializer
 from .serializers import UserSerializer 
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -18,6 +18,8 @@ from django.http import HttpResponse
 from rest_framework.permissions import AllowAny
 from home.models import SubmitForm
 import json
+from PIL import Image, ImageEnhance, ImageOps
+import os
 
 
 @api_view(['GET'])
@@ -271,3 +273,39 @@ def download_json_file(request):
     response['Content-Disposition'] = 'attachment; filename="form_data.json"'
 
     return response
+
+
+class ImageUploadView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = ImageUploadSerializer(data=request.data)
+        if serializer.is_valid():
+            # Handle the uploaded image
+            image = serializer.validated_data['image']
+            image_path = f'media/{image.name}'
+            
+            # Save the original image
+            with open(image_path, 'wb+') as destination:
+                for chunk in image.chunks():
+                    destination.write(chunk)
+
+            # Open the image using PIL
+            with Image.open(image_path) as img:
+                # Apply sepia filter
+                sepia_img = ImageOps.colorize(
+                    ImageOps.grayscale(img),
+                    black="#704214",
+                    white="#C0C0C0"
+                )
+                sepia_img_path = f'media/sepia_{image.name}'
+                sepia_img.save(sepia_img_path)
+
+            # Create a JSON response
+            json_response = {
+                "message": "Image uploaded and processed successfully",
+                "original_image_url": f'/media/{image.name}',
+                "sepia_image_url": f'/media/sepia_{image.name}'
+            }
+
+            return JsonResponse(json_response, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
